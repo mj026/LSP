@@ -93,13 +93,13 @@ def create_test_diagnostics(diagnostics: list[tuple[str, Range]]) -> dict:
     }
 
 
-class CodeActionsOnSaveTestCase(TextDocumentTestCase):
-
+class CodeActionsTestCaseBae(TextDocumentTestCase):
     @classmethod
     def init_view_settings(cls) -> None:
         super().init_view_settings()
         # "quickfix" is not supported but its here for testing purposes
         cls.view.settings().set('lsp_code_actions_on_save', {'source.fixAll': True, 'quickfix': True})
+        cls.view.settings().set("lsp_format_on_save", False)
 
     @classmethod
     def get_test_server_capabilities(cls) -> dict:
@@ -111,6 +111,8 @@ class CodeActionsOnSaveTestCase(TextDocumentTestCase):
         yield from self.await_clear_view_and_save()
         yield from super().doCleanups()
 
+
+class CodeActionsOnSaveTestCase(CodeActionsTestCaseBae):
     def test_applies_matching_kind(self) -> Generator:
         yield from self._setup_document_with_missing_semicolon()
         code_action_kind = 'source.fixAll'
@@ -233,21 +235,13 @@ class CodeActionsOnSaveTestCase(TextDocumentTestCase):
         )
 
 
-class CodeActionsOnFormatTestCase(TextDocumentTestCase):
-
+class CodeActionsOnFormatTestCase(CodeActionsTestCaseBae):
     @classmethod
     def init_view_settings(cls) -> None:
         super().init_view_settings()
-        # "quickfix" is not supported but its here for testing purposes
         cls.view.settings().set('lsp_code_actions_on_format', {'source.fixAll': True, 'quickfix': True})
 
-    @classmethod
-    def get_test_server_capabilities(cls) -> dict:
-        capabilities = deepcopy(super().get_test_server_capabilities())
-        capabilities['capabilities']['codeActionProvider'] = {'codeActionKinds': ['quickfix', 'source.fixAll']}
-        return capabilities
-
-    def test_format_with_fixall_code_action(self) -> Generator:
+    def test_formatting_with_code_actions_on_format(self) -> Generator:
         self.insert_characters(' const x = 1')
         yield from self.await_message('textDocument/didChange')
 
@@ -276,6 +270,38 @@ class CodeActionsOnFormatTestCase(TextDocumentTestCase):
         self.assertEqual(entire_content(self.view), 'const x = 1;')
         # Formatting does not save the document
         self.assertEqual(self.view.is_dirty(), True)
+
+    def test_format_on_save_with_code_actions_on_format(self) -> Generator:
+        self.view.settings().set("lsp_format_on_save", True)
+        self.insert_characters(' const x = 1')
+        yield from self.await_message("textDocument/didChange")
+
+        code_action_kind = 'source.fixAll'
+        code_action = create_test_code_action(
+            self.view,
+            self.view.change_count(),
+            [(';', range_from_points(Point(0, 12), Point(0, 12)))],
+            code_action_kind
+        )
+        self.set_response('textDocument/codeAction', [code_action])
+
+        self.set_response('textDocument/formatting', [{
+            'newText': "",
+            'range': {
+                'start': {'line': 0, 'character': 0},
+                'end': {'line': 0, 'character': 1}
+            }
+        }])
+
+        self.view.run_command("lsp_save", {'async': True})
+        yield from self.await_message('textDocument/codeAction')
+        yield from self.await_message("textDocument/formatting")
+        yield from self.await_message("textDocument/didChange")
+        yield from self.await_message("textDocument/didSave")
+        # Response is fixed (fixAll added ";") and formatted (removed leading space)
+        self.assertEqual(entire_content(self.view), 'const x = 1;')
+        # Document should be saved
+        self.assertEqual(self.view.is_dirty(), False)
 
 
 class CodeActionMatchingTestCase(unittest.TestCase):
