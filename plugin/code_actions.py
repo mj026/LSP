@@ -287,6 +287,20 @@ class CodeActionsOnFormatTask(CodeActionsTaskBase):
     SETTING_NAME = "lsp_code_actions_on_format"
 
 
+@final
+class CodeActionsFormatOnSaveTask(CodeActionsTaskBase):
+    """Run code actions on format when format_on_save is enabled."""
+
+    SETTING_NAME = "lsp_code_actions_on_format"
+
+    @classmethod
+    @override
+    def is_applicable(cls, view: sublime.View) -> bool:
+        format_on_save_enabled = bool(view.settings().get('lsp_format_on_save', False))
+        code_actions_on_format_defined = bool(cls._get_code_actions(view))
+        return bool(view.window() and format_on_save_enabled and code_actions_on_format_defined)
+
+
 class LspCodeActionsCommand(LspTextCommand):
 
     capability = 'codeActionProvider'
