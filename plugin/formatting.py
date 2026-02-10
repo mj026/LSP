@@ -181,9 +181,14 @@ class LspFormatDocumentCommand(LspTextCommandWithTasks):
             session.send_request_task(text_document_formatting(self.view)).then(self.on_result_async)
 
 
-class LspFormatDocumentRangeCommand(LspTextCommand):
+class LspFormatDocumentRangeCommand(LspTextCommandWithTasks):
 
     capability = 'documentRangeFormattingProvider'
+
+    @property
+    @override
+    def tasks(self) -> list[type[LspTask]]:
+        return [CodeActionsOnFormatTask]
 
     def is_enabled(self, event: dict | None = None, point: int | None = None) -> bool:
         if not super().is_enabled(event, point):
@@ -195,7 +200,8 @@ class LspFormatDocumentRangeCommand(LspTextCommand):
             return True
         return False
 
-    def run(self, edit: sublime.Edit, event: dict | None = None) -> None:
+    @override
+    def on_tasks_completed(self, **kwargs: dict[str, Any]) -> None:
         if listener := self.get_listener():
             listener.purge_changes_async()
         if has_single_nonempty_selection(self.view):

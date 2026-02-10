@@ -34,6 +34,8 @@ if TYPE_CHECKING:
 ConfigName = str
 CodeActionOrCommand = Union[CodeAction, Command]
 CodeActionsByConfigName = Tuple[ConfigName, List[CodeActionOrCommand]]
+CodeActionConfig = dict[str, bool]  # for example {"source.organizeImports.ruff": True}
+RequestIterator = Iterator[Promise[CodeActionsByConfigName]]
 
 MENU_ACTIONS_KINDS = [CodeActionKind.Refactor, CodeActionKind.Source]
 
@@ -152,7 +154,7 @@ class CodeActionsManager:
             .then(lambda actions_list: list(filter(lambda actions: len(actions[1]), actions_list)))
 
     def request_on_save_or_format_async(
-        self, view: sublime.View, on_save_actions: dict[str, bool]
+        self, view: sublime.View, on_save_actions: dict[str, bool], region: sublime.Region
     ) -> Generator[Promise[CodeActionsByConfigName]]:
         listener = windows.listener_for_view(view)
         if not listener:
@@ -177,7 +179,6 @@ class CodeActionsManager:
                 listener.purge_changes_async()
                 # Pull for diagnostics to ensure that server computes them before receiving code action request.
                 sb.do_document_diagnostic_async(view, view.change_count())
-                region = entire_content_region(view)
                 diagnostics = [diagnostic for diagnostic, _ in sb.diagnostics]
                 params = text_document_code_action_params(view, region, diagnostics, [kind], manual=False)
                 yield sb.session.send_request_task(Request.codeAction(params, view)).then(partial(on_response, sb))
@@ -237,12 +238,17 @@ class CodeActionsTaskBase(LspTask):
             key: value for key, value in code_actions.items() if key.startswith('source.')
         }
 
+    def request_iterator(self, view: sublime.View, code_actions: CodeActionConfig) -> RequestIterator:
+        region = entire_content_region(view)
+        return actions_manager.request_on_save_or_format_async(view, code_actions, region=region)
+
     @override
     def run_async(self) -> None:
         super().run_async()
-        view = self._task_runner.view
+        view: sublime.View = self._task_runner.view
         code_actions = self._get_code_actions(view)
-        request_iterator = actions_manager.request_on_save_or_format_async(view, code_actions)
+
+        request_iterator = self.request_iterator(view=view, code_actions=code_actions)
         self._process_next_request(request_iterator)
 
     def _process_next_request(self, request_iterator: Iterator[Promise[CodeActionsByConfigName]]) -> None:
@@ -294,10 +300,24 @@ class CodeActionsFormattingOnSaveTask(CodeActionsTaskBase):
     SETTING_NAME = "lsp_code_actions_on_format"
 
     @classmethod
+    @override
     def is_applicable(cls, view: sublime.View) -> bool:
         format_on_save_enabled = bool(view.settings().get('lsp_format_on_save', False))
         code_actions_defined = bool(cls._get_code_actions(view))
         return bool(view.window() and format_on_save_enabled and code_actions_defined)
+
+
+@final
+class CodeActionsOnFormatRegionTask(CodeActionsTaskBase):
+    """Run code actions on format for the current selection (region)."""
+
+    SETTING_NAME = "lsp_code_actions_on_format"
+
+    @override
+    def request_iterator(self, view: sublime.View, code_actions: CodeActionConfig) -> RequestIterator:
+        if region := first_selection_region(view):
+            return actions_manager.request_on_save_or_format_async(view, code_actions, region=region)
+        yield from ()
 
 
 class LspCodeActionsCommand(LspTextCommand):
