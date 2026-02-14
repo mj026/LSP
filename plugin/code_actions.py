@@ -299,7 +299,7 @@ class CodeActionsFormatOnSaveTask(CodeActionsTaskBase):
         if not super().is_applicable(view):
             # When there are no code actions configured we can return immediately
             return False
-        format_on_save_enabled = bool(view.settings().get('lsp_format_on_save', False))
+        format_on_save_enabled = bool(view.settings().get('lsp_format_on_save', userprefs().lsp_format_on_save))
         return format_on_save_enabled
 
 

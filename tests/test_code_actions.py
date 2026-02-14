@@ -8,6 +8,7 @@ from LSP.plugin.core.url import filename_to_uri
 from LSP.plugin.core.views import entire_content
 from LSP.plugin.core.views import kind_contains_other_kind
 from LSP.plugin.core.views import versioned_text_document_identifier
+from LSP.plugin.core.settings import userprefs
 from LSP.plugin.documents import DocumentSyncListener
 from LSP.protocol import Range
 from setup import TextDocumentTestCase
@@ -324,9 +325,16 @@ class CodeActionsFormatOnSaveTaskTestCase(unittest.TestCase):
         self.view.settings().set("lsp_format_on_save", True)
         self.assertFalse(CodeActionsFormatOnSaveTask.is_applicable(self.view))
 
-    def test_code_actions_format_on_save_task_enabled__set_correctly(self):
+    def test_code_actions_format_on_save_task_enabled__standard_settings(self):
         self.view.settings().set('lsp_code_actions_on_format', {"source.fixAll": True})
         self.view.settings().set("lsp_format_on_save", True)
+        self.assertTrue(CodeActionsFormatOnSaveTask.is_applicable(self.view))
+
+    def test_code_actions_format_on_save_task_enabled__user_settings(self):
+        self.view.settings().set('lsp_code_actions_on_format', {"source.fixAll": True})
+        del self.view.settings()["lsp_format_on_save"]
+        self.assertFalse(CodeActionsFormatOnSaveTask.is_applicable(self.view))
+        userprefs().lsp_format_on_save = True
         self.assertTrue(CodeActionsFormatOnSaveTask.is_applicable(self.view))
 
 
