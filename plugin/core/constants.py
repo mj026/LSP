@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from ...protocol import CodeActionKind
 from ...protocol import CompletionItemKind
 from ...protocol import DiagnosticSeverity
@@ -9,9 +10,11 @@ from ...protocol import MessageType
 from ...protocol import SymbolKind
 from .typing import StrEnum
 from enum import IntFlag
-from os.path import dirname, join
+from os.path import dirname
+from os.path import join
 from typing import Tuple
 import sublime
+
 
 try:
     from mdpopups.marko import __version__ as marko_version  # pyright: ignore[reportMissingImports]

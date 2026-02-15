@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from ..protocol import CodeLens
 from ..protocol import ColorInformation
 from ..protocol import Diagnostic
@@ -60,12 +61,15 @@ from .diagnostics import DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY
 from .diagnostics import get_diagnostics_identifiers
 from .inlay_hint import inlay_hint_to_phantom
 from functools import partial
-from typing import Any, Callable, Iterable, List
+from typing import Any
+from typing import Callable
 from typing import cast
+from typing import Iterable
+from typing import List
 from typing_extensions import Concatenate
+from typing_extensions import deprecated
 from typing_extensions import ParamSpec
 from typing_extensions import TypeGuard
-from typing_extensions import deprecated
 from weakref import WeakSet
 import itertools
 import sublime

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from copy import deepcopy
 from LSP.plugin.code_actions import get_matching_on_save_kinds
 from LSP.plugin.core.constants import RegionKey
@@ -11,9 +12,11 @@ from LSP.plugin.documents import DocumentSyncListener
 from LSP.protocol import Range
 from setup import TextDocumentTestCase
 from test_single_document import TEST_FILE_PATH
-from typing import Any, Generator
-import unittest
+from typing import Any
+from typing import Generator
 import sublime
+import unittest
+
 
 TEST_FILE_URI = filename_to_uri(TEST_FILE_PATH)
 

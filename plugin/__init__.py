@@ -28,6 +28,7 @@ from .core.views import MarkdownLangMap
 from .core.views import uri_from_view
 from .core.workspace import WorkspaceFolder
 
+
 # This is the public API for LSP-* packages
 __all__ = [
     '__version__',

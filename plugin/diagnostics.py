@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from ..protocol import Diagnostic
 from ..protocol import DiagnosticOptions
 from ..protocol import DiagnosticRegistrationOptions

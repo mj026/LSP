@@ -1,9 +1,16 @@
 from __future__ import annotations
+
 from ...protocol import *  # For backward compatibility with LSP packages.
 from functools import total_ordering
-from typing import Any, Callable, Generic, TypedDict, TypeVar, Union
+from typing import Any
+from typing import Callable
+from typing import Generic
+from typing import TypedDict
+from typing import TypeVar
+from typing import Union
 from typing_extensions import NotRequired
 import sublime
+
 
 INT_MAX = 2**31 - 1
 UINT_MAX = INT_MAX

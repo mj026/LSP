@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from LSP.plugin.core.message_request_handler import MessageRequestHandler
 from test_mocks import MockSession
 import sublime

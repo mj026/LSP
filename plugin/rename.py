@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from ..protocol import PrepareRenameParams
 from ..protocol import PrepareRenameResult
 from ..protocol import Range

@@ -3,9 +3,18 @@
 # LSP v3.17.0
 
 from __future__ import annotations
+
 from ..plugin.core.typing import StrEnum
-from enum import IntEnum, IntFlag
-from typing import Any, Dict, List, Literal, Mapping, Sequence, TypedDict, Union
+from enum import IntEnum
+from enum import IntFlag
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Literal
+from typing import Mapping
+from typing import Sequence
+from typing import TypedDict
+from typing import Union
 from typing_extensions import NotRequired
 
 

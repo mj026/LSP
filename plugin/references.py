@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from ..protocol import Location
 from .core.constants import RegionKey
 from .core.protocol import Point

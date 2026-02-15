@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
-from typing import Generator, List, Optional, Tuple
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
 import argparse
 import json
 import os
 import re
 import subprocess
 import sys
+
 
 # Internal
 PACKAGE_PATH = os.path.realpath(os.path.join(os.path.join(os.path.dirname(__file__), '..')))

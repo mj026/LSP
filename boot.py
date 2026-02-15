@@ -1,7 +1,4 @@
 from __future__ import annotations
-import os
-import sublime
-import sublime_plugin
 
 # Please keep this list sorted (Edit -> Sort Lines)
 from .plugin.code_actions import LspCodeActionsCommand
@@ -89,6 +86,10 @@ from .plugin.tooling import LspOnDoubleClickCommand
 from .plugin.tooling import LspParseVscodePackageJson
 from .plugin.tooling import LspTroubleshootServerCommand
 from typing import Any
+import os
+import sublime
+import sublime_plugin
+
 
 __all__ = (
     "DocumentSyncListener",

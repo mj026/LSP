@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from .constants import SublimeKind
 from .css import css
 from .promise import Promise
@@ -13,6 +14,7 @@ import html
 import sublime
 import sublime_api  # pyright: ignore[reportMissingImports]
 import uuid
+
 
 # pyright: reportInvalidTypeVarUse=false
 T = TypeVar('T')
