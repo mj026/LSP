@@ -115,7 +115,6 @@ ignore = [
     "FURB140",  # https://docs.astral.sh/ruff/rules/reimplemented-starmap/
     "FURB154",  # https://docs.astral.sh/ruff/rules/repeated-global/
     "FURB180",  # https://docs.astral.sh/ruff/rules/meta-class-abc-meta/
-    "I001",  # https://docs.astral.sh/ruff/rules/unsorted-imports/
     "INP001",  # https://docs.astral.sh/ruff/rules/implicit-namespace-package/
     "ISC001",  # https://docs.astral.sh/ruff/rules/single-line-implicit-string-concatenation/
     "ISC003",  # https://docs.astral.sh/ruff/rules/explicit-string-concatenation/
@@ -241,6 +240,14 @@ ignore = [
     "UP037",  # https://docs.astral.sh/ruff/rules/quoted-annotation/
     "UP045",  # https://docs.astral.sh/ruff/rules/non-pep604-annotation-optional/
 ]
+
+[tool.ruff.lint.isort]
+case-sensitive = false
+from-first = true
+force-single-line = true
+lines-after-imports = 2
+no-sections = true
+order-by-type = false
 
 [tool.mypy]
 python_version = "3.9"
